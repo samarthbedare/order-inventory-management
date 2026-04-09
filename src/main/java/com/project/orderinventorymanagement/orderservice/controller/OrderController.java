@@ -12,4 +12,9 @@ public class OrderController {
     public String greet() {
         return "Hello";
     }
+    
+    @GetMapping("/hello1")
+    public String greet1() {
+        return "Hello123";
+    }
 }
