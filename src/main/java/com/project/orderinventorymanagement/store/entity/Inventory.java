@@ -1,6 +1,8 @@
 package com.project.orderinventorymanagement.store.entity;
 
  
+import com.project.orderinventorymanagement.productservice.entity.Product;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -8,14 +10,17 @@ import jakarta.persistence.*;
 public class Inventory {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inventory_id")
     private Integer inventoryId;
 
-    @Column(name = "store_id")
-    private Integer storeId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store; 
 
-    @Column(name = "product_id")
-    private Integer productId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product; 
 
     @Column(name = "product_inventory")
     private Integer productInventory; // quantity
@@ -28,20 +33,20 @@ public class Inventory {
 		this.inventoryId = inventoryId;
 	}
 
-	public Integer getStoreId() {
-		return storeId;
+	public Store getStore() {
+		return store;
 	}
 
-	public void setStoreId(Integer storeId) {
-		this.storeId = storeId;
+	public void setStore(Store store) {
+		this.store = store;
 	}
 
-	public Integer getProductId() {
-		return productId;
+	public Product getProduct() {
+		return product;
 	}
 
-	public void setProductId(Integer productId) {
-		this.productId = productId;
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
 	public Integer getProductInventory() {
@@ -52,7 +57,6 @@ public class Inventory {
 		this.productInventory = productInventory;
 	}
 
-    // getters & setters
-    
+	
     
 }

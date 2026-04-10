@@ -1,7 +1,10 @@
 package com.project.orderinventorymanagement.store.entity;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "stores")
@@ -20,11 +23,15 @@ public class Store {
     @Column(name = "physical_address")
     private String physicalAddress;
 
-    private Double latitude;
-    private Double longitude;
+    @Column(name = "latitude", precision = 9, scale = 6)
+    private BigDecimal latitude;
 
-    @Lob
-    private byte[] logo;
+    @Column(name = "longitude", precision = 9, scale = 6)
+    private BigDecimal longitude;
+
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Inventory> inventories;
+   
 
     @Column(name = "logo_mime_type")
     private String logoMimeType;
@@ -70,29 +77,23 @@ public class Store {
 		this.physicalAddress = physicalAddress;
 	}
 
-	public Double getLatitude() {
+	public BigDecimal getLatitude() {
 		return latitude;
 	}
 
-	public void setLatitude(Double latitude) {
+	public void setLatitude(BigDecimal latitude) {
 		this.latitude = latitude;
 	}
 
-	public Double getLongitude() {
+	public BigDecimal getLongitude() {
 		return longitude;
 	}
 
-	public void setLongitude(Double longitude) {
+	public void setLongitude(BigDecimal longitude) {
 		this.longitude = longitude;
 	}
 
-	public byte[] getLogo() {
-		return logo;
-	}
-
-	public void setLogo(byte[] logo) {
-		this.logo = logo;
-	}
+	 
 
 	public String getLogoMimeType() {
 		return logoMimeType;
