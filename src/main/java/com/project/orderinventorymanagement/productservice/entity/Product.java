@@ -1,12 +1,17 @@
 package com.project.orderinventorymanagement.productservice.entity;
 
 import java.math.BigDecimal;
+import java.util.List;
+
+import com.project.orderinventorymanagement.orderservice.model.OrderItem;
+import com.project.orderinventorymanagement.store.entity.Inventory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -35,6 +40,12 @@ public class Product {
 
     @Column(name = "rating", nullable = false)
     private Integer rating;
+    
+    @OneToMany(mappedBy = "product")
+    private List<Inventory> inventories;
+
+    @OneToMany(mappedBy = "product")
+    private List<OrderItem> orderItems;
 
     public Product() {}
 
