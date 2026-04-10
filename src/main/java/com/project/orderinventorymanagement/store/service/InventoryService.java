@@ -24,18 +24,18 @@ public class InventoryService {
 
     // Get Inventory
     public Inventory getInventory(Integer storeId, Integer productId) {
-        return repo.findByStoreIdAndProductId(storeId, productId)
+        return repo.findByStoreStoreIdAndProductProductId(storeId, productId)
                 .orElseThrow(() -> new RuntimeException("Inventory not found"));
     }
     
     //  Get stock across all stores for a product
     public List<Inventory> getStockByProduct(Integer productId) {
-        return repo.findByProductId(productId);
+        return repo.findByProductProductId(productId);
     }
 
     // Get all products in a store
     public List<Inventory> getProductsByStore(Integer storeId) {
-        return repo.findByStoreId(storeId);
+        return repo.findByStoreStoreId(storeId);
     }
 
     // Reduce Quantity (After Order)
@@ -43,7 +43,7 @@ public class InventoryService {
     public void reduceStock(InventoryDTO dto) {
 
         //Fetch inventory
-        Inventory inventory = repo.findByStoreIdAndProductId(
+        Inventory inventory = repo.findByStoreStoreIdAndProductProductId(
                 dto.getStoreId(),
                 dto.getProductId()
         ).orElseThrow(() -> new RuntimeException("Product not found"));

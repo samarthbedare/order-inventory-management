@@ -1,13 +1,15 @@
 package com.project.orderinventorymanagement.store.dto;
 
+import java.math.BigDecimal;
+
 public class StoreDTO {
 
     private Integer storeId;
     private String storeName;
     private String webAddress;
     private String physicalAddress;
-    private Double latitude;
-    private Double longitude;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
 	public Integer getStoreId() {
 		return storeId;
 	}
@@ -32,16 +34,16 @@ public class StoreDTO {
 	public void setPhysicalAddress(String physicalAddress) {
 		this.physicalAddress = physicalAddress;
 	}
-	public Double getLatitude() {
+	public BigDecimal getLatitude() {
 		return latitude;
 	}
-	public void setLatitude(Double latitude) {
+	public void setLatitude(BigDecimal latitude) {
 		this.latitude = latitude;
 	}
-	public Double getLongitude() {
+	public BigDecimal getLongitude() {
 		return longitude;
 	}
-	public void setLongitude(Double longitude) {
+	public void setLongitude(BigDecimal longitude) {
 		this.longitude = longitude;
 	}
 
