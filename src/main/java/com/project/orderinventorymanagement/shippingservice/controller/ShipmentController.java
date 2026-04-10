@@ -1,17 +1,11 @@
 package com.project.orderinventorymanagement.shippingservice.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
+import com.project.orderinventorymanagement.customerservice.entity.Customer;
+import com.project.orderinventorymanagement.customerservice.service.CustomerService;
 import com.project.orderinventorymanagement.shippingservice.dto.ShipmentRequestDTO;
 import com.project.orderinventorymanagement.shippingservice.dto.ShipmentResponseDTO;
 import com.project.orderinventorymanagement.shippingservice.entity.Shipment;
@@ -25,23 +19,28 @@ public class ShipmentController {
     @Autowired
     private ShipmentService shipmentService;
 
+    @Autowired
+    private CustomerService customerService;
+
     @PostMapping
     public ResponseEntity<ShipmentResponseDTO> createShipment(@RequestBody ShipmentRequestDTO request) {
-
         Shipment shipment = new Shipment();
-        shipment.setCustomerId(request.getCustomerId());
-        shipment.setStoreId(request.getStoreId());
         shipment.setDeliveryAddress(request.getDeliveryAddress());
+        shipment.setStoreId(request.getStoreId());
+        
+        
+        Customer customer = customerService.getCustomer(request.getCustomerId());
+        
+        shipment.setCustomer(customer);
 
         Shipment savedShipment = shipmentService.createShipment(shipment);
-        
         return ResponseEntity.ok(convertToResponseDTO(savedShipment));
     }
 
     private ShipmentResponseDTO convertToResponseDTO(Shipment shipment) {
         ShipmentResponseDTO dto = new ShipmentResponseDTO();
         dto.setShipmentId(shipment.getShipmentId());
-        dto.setCustomerId(shipment.getCustomerId());
+        dto.setCustomerId(shipment.getCustomer().getCustomerId());
         dto.setStoreId(shipment.getStoreId());
         dto.setDeliveryAddress(shipment.getDeliveryAddress());
         dto.setShipmentStatus(shipment.getShipmentStatus());
@@ -49,14 +48,13 @@ public class ShipmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Shipment> getShipment(@PathVariable Integer id) {
+    public ResponseEntity<Shipment> getShipment(@PathVariable Long id) {
         Shipment shipment = shipmentService.getShipmentById(id);
         return shipment != null ? ResponseEntity.ok(shipment) : ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/{id}/status")
-
-    public ResponseEntity<Shipment> updateStatus(@PathVariable Integer id, @RequestBody ShipmentStatus status) {
+    public ResponseEntity<Shipment> updateStatus(@PathVariable Long id, @RequestBody ShipmentStatus status) {
         Shipment updated = shipmentService.updateStatus(id, status);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }

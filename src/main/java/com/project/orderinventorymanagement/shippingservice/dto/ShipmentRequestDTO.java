@@ -1,9 +1,10 @@
 package com.project.orderinventorymanagement.shippingservice.dto;
 
 public class ShipmentRequestDTO {
-    private Integer customerId;
+	private Integer customerId;
     private Integer storeId;
     private String deliveryAddress;
+	
 	public Integer getCustomerId() {
 		return customerId;
 	}
@@ -22,6 +23,7 @@ public class ShipmentRequestDTO {
 	public void setDeliveryAddress(String deliveryAddress) {
 		this.deliveryAddress = deliveryAddress;
 	}
+	
     
     
 }
