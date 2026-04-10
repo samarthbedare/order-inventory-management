@@ -3,11 +3,14 @@ package com.project.orderinventorymanagement.shippingservice.dto;
 import com.project.orderinventorymanagement.shippingservice.entity.ShipmentStatus;
 
 public class ShipmentResponseDTO {
-    private Integer shipmentId;
-    private Integer customerId;
+    private Integer shipmentId;    
+    private Integer customerId;   
     private Integer storeId;
     private String deliveryAddress;
-    private ShipmentStatus shipmentStatus;
+    private String shipmentStatus; 
+    
+	
+	
 	public Integer getShipmentId() {
 		return shipmentId;
 	}
@@ -32,10 +35,12 @@ public class ShipmentResponseDTO {
 	public void setDeliveryAddress(String deliveryAddress) {
 		this.deliveryAddress = deliveryAddress;
 	}
-	public ShipmentStatus getShipmentStatus() {
+	public String getShipmentStatus() {
 		return shipmentStatus;
 	}
-	public void setShipmentStatus(ShipmentStatus shipmentStatus) {
+	public void setShipmentStatus(String shipmentStatus) {
 		this.shipmentStatus = shipmentStatus;
 	}
+    
+    
 }

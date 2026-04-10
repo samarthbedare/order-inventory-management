@@ -1,6 +1,5 @@
 package com.project.orderinventorymanagement.store.entity;
 
- 
 import com.project.orderinventorymanagement.productservice.entity.Product;
 
 import jakarta.persistence.*;

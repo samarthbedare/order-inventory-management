@@ -1,18 +1,10 @@
 package com.project.orderinventorymanagement.productservice.entity;
 
+import com.project.orderinventorymanagement.store.entity.Inventory;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.util.List;
-
-import com.project.orderinventorymanagement.orderservice.model.OrderItem;
-import com.project.orderinventorymanagement.store.entity.Inventory;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "products")
@@ -40,14 +32,12 @@ public class Product {
 
     @Column(name = "rating", nullable = false)
     private Integer rating;
-    
+
     @OneToMany(mappedBy = "product")
     private List<Inventory> inventories;
 
-    @OneToMany(mappedBy = "product")
-    private List<OrderItem> orderItems;
-
-    public Product() {}
+    public Product() {
+    }
 
     public Product(Integer productId, String productName, BigDecimal unitPrice,
                    String colour, String brand, String size, Integer rating) {
@@ -60,50 +50,67 @@ public class Product {
         this.rating = rating;
     }
 
-    public Integer getProductId() { return productId; }
-    public void setProductId(Integer productId) { 
-    	this.productId = productId; 
-    	}
+    public Integer getProductId() {
+        return productId;
+    }
 
-    public String getProductName() { 
-    	return productName; 
-    	}
-    public void setProductName(String productName) { 
-    	this.productName = productName;
-    	}
+    public void setProductId(Integer productId) {
+        this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
 
     public BigDecimal getUnitPrice() {
-    	return unitPrice; 
-    	}
-    public void setUnitPrice(BigDecimal unitPrice) { 
-    	this.unitPrice = unitPrice;
-    	}
+        return unitPrice;
+    }
 
-    public String getColour() { 
-    	return colour; 
-    	}
-    public void setColour(String colour) { 
-    	this.colour = colour; 
-    	}
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
+    }
 
-    public String getBrand() { 
-    	return brand; 
-    	}
+    public String getColour() {
+        return colour;
+    }
+
+    public void setColour(String colour) {
+        this.colour = colour;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
     public void setBrand(String brand) {
-    	this.brand = brand; 
-    	}
+        this.brand = brand;
+    }
 
     public String getSize() {
-    	return size; 
-    	}
-    public void setSize(String size) {
-    	this.size = size; 
-    	}
+        return size;
+    }
 
-    public Integer getRating() { 
-    	return rating; 
-    	}
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
     public void setRating(Integer rating) {
-    	this.rating = rating; 
-    	}
-}	
+        this.rating = rating;
+    }
+
+    public List<Inventory> getInventories() {
+        return inventories;
+    }
+
+    public void setInventories(List<Inventory> inventories) {
+        this.inventories = inventories;
+    }
+}

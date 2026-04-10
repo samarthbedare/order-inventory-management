@@ -11,6 +11,5 @@ import com.project.orderinventorymanagement.shippingservice.entity.Shipment;
 
 @Repository
 public interface ShipmentRepository extends JpaRepository<Shipment, Integer> {
-    
-    List<Shipment> findByCustomerId(Integer customerId);
+    List<Shipment> findByCustomerCustomerId(Integer customerId);
 }

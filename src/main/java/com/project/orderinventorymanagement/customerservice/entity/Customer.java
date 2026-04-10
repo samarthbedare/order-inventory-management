@@ -1,6 +1,10 @@
 package com.project.orderinventorymanagement.customerservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.project.orderinventorymanagement.shippingservice.entity.Shipment;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "customers")
@@ -9,23 +13,23 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id")
-    private Long customerId;
+    private Integer customerId;
 
-    @Column(name = "full_name")
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(name = "email_address")
+    @Column(name = "email_address", nullable = false, unique = true)
     private String emailAddress;
 
-    private String status = "ACTIVE";
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Shipment> shipments;
 
-
-
-    public Long getCustomerId() {
+    public Integer getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(Integer customerId) {
         this.customerId = customerId;
     }
 
@@ -45,11 +49,11 @@ public class Customer {
         this.emailAddress = emailAddress;
     }
 
-    public String getStatus() {
-        return status;
+    public List<Shipment> getShipments() {
+        return shipments;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setShipments(List<Shipment> shipments) {
+        this.shipments = shipments;
     }
 }
