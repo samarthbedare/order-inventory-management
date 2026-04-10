@@ -20,11 +20,11 @@ public class ShipmentService {
         return shipmentRepository.save(shipment);
     }
 
-    public Shipment getShipmentById(Long id) { 
+    public Shipment getShipmentById(Integer id) { 
         return shipmentRepository.findById(id).orElse(null);
     }
 
-    public Shipment updateStatus(Long id, ShipmentStatus status) { 
+    public Shipment updateStatus(Integer id, ShipmentStatus status) { 
         Shipment shipment = shipmentRepository.findById(id).orElse(null);
         if (shipment != null) {
             shipment.setShipmentStatus(status.name()); 

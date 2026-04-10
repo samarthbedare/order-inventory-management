@@ -48,13 +48,13 @@ public class ShipmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Shipment> getShipment(@PathVariable Long id) {
+    public ResponseEntity<Shipment> getShipment(@PathVariable Integer id) {
         Shipment shipment = shipmentService.getShipmentById(id);
         return shipment != null ? ResponseEntity.ok(shipment) : ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Shipment> updateStatus(@PathVariable Long id, @RequestBody ShipmentStatus status) {
+    public ResponseEntity<Shipment> updateStatus(@PathVariable Integer id, @RequestBody ShipmentStatus status) {
         Shipment updated = shipmentService.updateStatus(id, status);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }

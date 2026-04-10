@@ -13,7 +13,7 @@ public class Shipment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "shipment_id")
-    private Long shipmentId;
+    private Integer shipmentId;
 
     @Column(name = "delivery_address", nullable = false)
     private String deliveryAddress;
@@ -28,11 +28,13 @@ public class Shipment {
     @Column(name = "store_id", nullable = false)
     private Integer storeId;
 
-	public Long getShipmentId() {
+	
+
+	public Integer getShipmentId() {
 		return shipmentId;
 	}
 
-	public void setShipmentId(Long shipmentId) {
+	public void setShipmentId(Integer shipmentId) {
 		this.shipmentId = shipmentId;
 	}
 
