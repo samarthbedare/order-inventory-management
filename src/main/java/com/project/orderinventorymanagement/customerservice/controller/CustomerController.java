@@ -28,7 +28,7 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
-    public Customer getById(@PathVariable Long id) {
+    public Customer getById(@PathVariable Integer id) { // Changed to Integer
         return service.getCustomer(id);
     }
 
@@ -38,19 +38,18 @@ public class CustomerController {
     }
 
     @PutMapping("/{id}")
-    public Customer update(@PathVariable Long id, @RequestBody Customer c) {
+    public Customer update(@PathVariable Integer id, @RequestBody Customer c) { // Changed to Integer
         return service.updateCustomer(id, c);
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Integer id) { // Changed to Integer
         service.deleteCustomer(id);
         return "Deleted";
     }
 
-   
     @GetMapping("/validate/{id}")
-    public boolean validate(@PathVariable Long id) {
+    public boolean validate(@PathVariable Integer id) { // Changed to Integer
         return service.validateCustomer(id);
     }
 }
