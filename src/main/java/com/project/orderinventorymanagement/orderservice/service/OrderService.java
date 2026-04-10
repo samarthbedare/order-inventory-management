@@ -1,12 +1,12 @@
 package com.project.orderinventorymanagement.orderservice.service;
 
-
 import com.project.orderinventorymanagement.orderservice.dto.OrderItemRequest;
 import com.project.orderinventorymanagement.orderservice.dto.OrderRequest;
 import com.project.orderinventorymanagement.orderservice.dto.OrderResponse;
 import com.project.orderinventorymanagement.orderservice.model.Order;
 import com.project.orderinventorymanagement.orderservice.model.OrderItem;
 import com.project.orderinventorymanagement.orderservice.model.OrderStatus;
+import com.project.orderinventorymanagement.orderservice.repository.OrderItemRepository;
 import com.project.orderinventorymanagement.orderservice.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,35 +20,42 @@ import java.util.Optional;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository) {
         this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemRepository;
     }
 
     @Transactional
     public OrderResponse createOrder(OrderRequest request) {
+        // Step 1: Save Order first (without items)
         Order order = new Order();
         order.setCustomerId(request.getCustomerId());
         order.setStoreId(request.getStoreId());
         order.setOrderTms(LocalDateTime.now());
         order.setOrderStatus(OrderStatus.OPEN);
+        order.setOrderItems(new ArrayList<>());
 
-        List<OrderItem> items = new ArrayList<>();
+        Order savedOrder = orderRepository.save(order);
+        Integer generatedOrderId = savedOrder.getOrderId();
+
+        // Step 2: Save each OrderItem separately with the generated order_id
+        List<OrderItem> savedItems = new ArrayList<>();
         if (request.getItems() != null) {
             for (OrderItemRequest itemReq : request.getItems()) {
                 OrderItem item = new OrderItem();
+                item.setOrderId(generatedOrderId);  // manually set FK = PK
                 item.setLineItemId(itemReq.getLineItemId());
                 item.setProductId(itemReq.getProductId());
                 item.setUnitPrice(itemReq.getUnitPrice());
                 item.setQuantity(itemReq.getQuantity());
-                item.setOrder(order);   // <-- this is the key fix
-                items.add(item);
+                savedItems.add(orderItemRepository.save(item));
             }
         }
-        order.setOrderItems(items);
 
-        Order saved = orderRepository.save(order);
-        return toResponse(saved);
+        savedOrder.setOrderItems(savedItems);
+        return toResponse(savedOrder);
     }
 
     public Optional<OrderResponse> getOrderById(Integer id) {
@@ -112,5 +119,18 @@ public class OrderService {
         }
         response.setItems(itemDetails);
         return response;
+    }
+
+    @Transactional
+    public Optional<OrderResponse> linkShipment(Integer orderId, Integer shipmentId) {
+        return orderRepository.findById(orderId).map(order -> {
+            if (order.getOrderItems() != null) {
+                for (OrderItem item : order.getOrderItems()) {
+                    item.setShipmentId(shipmentId);
+                    orderItemRepository.save(item);
+                }
+            }
+            return toResponse(order);
+        });
     }
 }

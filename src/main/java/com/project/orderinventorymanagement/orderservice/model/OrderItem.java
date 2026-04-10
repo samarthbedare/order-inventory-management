@@ -1,6 +1,9 @@
 package com.project.orderinventorymanagement.orderservice.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 
@@ -10,12 +13,7 @@ public class OrderItem {
 
     @Id
     @Column(name = "order_id")
-    private Integer orderId;
-
-    @ManyToOne
-    @MapsId
-    @JoinColumn(name = "order_id")
-    private Order order;
+    private Integer orderId;  // NO @GeneratedValue — we set this manually
 
     @Column(name = "line_item_id", nullable = false)
     private Integer lineItemId;
@@ -41,14 +39,6 @@ public class OrderItem {
 
     public void setOrderId(Integer orderId) {
         this.orderId = orderId;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
     }
 
     public Integer getLineItemId() {

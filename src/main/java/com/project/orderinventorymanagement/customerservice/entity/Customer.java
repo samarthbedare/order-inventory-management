@@ -1,11 +1,10 @@
 package com.project.orderinventorymanagement.customerservice.entity;
 
-import jakarta.persistence.*;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.project.orderinventorymanagement.orderservice.model.Order;
 import com.project.orderinventorymanagement.shippingservice.entity.Shipment;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "customers")
@@ -14,7 +13,7 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id")
-    private Integer customerId; // Changed to Integer
+    private Integer customerId;
 
     @Column(name = "full_name", nullable = false)
     private String fullName;
@@ -24,24 +23,37 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Order> orders;
-
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Shipment> shipments;
 
-    public Integer getCustomerId() { return customerId; }
-    public void setCustomerId(Integer customerId) { this.customerId = customerId; }
+    public Integer getCustomerId() {
+        return customerId;
+    }
 
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
+    public void setCustomerId(Integer customerId) {
+        this.customerId = customerId;
+    }
 
-    public String getEmailAddress() { return emailAddress; }
-    public void setEmailAddress(String emailAddress) { this.emailAddress = emailAddress; }
+    public String getFullName() {
+        return fullName;
+    }
 
-    public List<Order> getOrders() { return orders; }
-    public void setOrders(List<Order> orders) { this.orders = orders; }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-    public List<Shipment> getShipments() { return shipments; }
-    public void setShipments(List<Shipment> shipments) { this.shipments = shipments; }
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    public List<Shipment> getShipments() {
+        return shipments;
+    }
+
+    public void setShipments(List<Shipment> shipments) {
+        this.shipments = shipments;
+    }
 }
