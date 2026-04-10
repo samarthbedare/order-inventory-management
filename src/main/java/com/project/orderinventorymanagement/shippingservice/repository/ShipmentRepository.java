@@ -10,6 +10,6 @@ import com.project.orderinventorymanagement.shippingservice.entity.Shipment;
 
 
 @Repository
-public interface ShipmentRepository extends JpaRepository<Shipment, Long> {
+public interface ShipmentRepository extends JpaRepository<Shipment, Integer> {
     List<Shipment> findByCustomerCustomerId(Integer customerId);
 }
