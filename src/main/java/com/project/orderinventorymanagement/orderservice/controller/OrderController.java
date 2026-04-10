@@ -70,4 +70,16 @@ public class OrderController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    // PATCH /orders/{id}/shipment
+    @PatchMapping("/{id}/shipment")
+    public ResponseEntity<OrderResponse> linkShipment(
+            @PathVariable Integer id,
+            @RequestBody Map<String, Integer> body) {
+        Integer shipmentId = body.get("shipmentId");
+        Optional<OrderResponse> response = orderService.linkShipment(id, shipmentId);
+        return response
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

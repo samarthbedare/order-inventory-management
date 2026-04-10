@@ -1,6 +1,5 @@
 package com.project.orderinventorymanagement.orderservice.model;
 
-
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -28,7 +27,8 @@ public class Order {
     @Column(name = "store_id", nullable = false)
     private Integer storeId;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
     private List<OrderItem> orderItems;
 
     public Order() {
