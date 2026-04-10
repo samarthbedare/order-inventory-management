@@ -16,24 +16,24 @@ public class ShipmentService {
     private ShipmentRepository shipmentRepository;
 
     public Shipment createShipment(Shipment shipment) {
-        shipment.setShipmentStatus(ShipmentStatus.CREATED);
+        shipment.setShipmentStatus(ShipmentStatus.CREATED.name()); 
         return shipmentRepository.save(shipment);
     }
 
-    public Shipment getShipmentById(Integer id) {
+    public Shipment getShipmentById(Long id) { 
         return shipmentRepository.findById(id).orElse(null);
     }
 
-    public Shipment updateStatus(Integer id, ShipmentStatus status) {
+    public Shipment updateStatus(Long id, ShipmentStatus status) { 
         Shipment shipment = shipmentRepository.findById(id).orElse(null);
         if (shipment != null) {
-            shipment.setShipmentStatus(status);
+            shipment.setShipmentStatus(status.name()); 
             return shipmentRepository.save(shipment);
         }
         return null;
     }
 
-    public List<Shipment> getShipmentsByCustomer(Integer customerId) {
-        return shipmentRepository.findByCustomerId(customerId);
+    public List<Shipment> getShipmentsByCustomer(Integer customerId) { 
+        return shipmentRepository.findByCustomerCustomerId(customerId);
     }
 }
