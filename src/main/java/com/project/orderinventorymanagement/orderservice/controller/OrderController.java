@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/orders")
@@ -32,10 +31,7 @@ public class OrderController {
     // GET /orders/{id}
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Integer id) {
-        Optional<OrderResponse> response = orderService.getOrderById(id);
-        return response
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
     // GET /orders/customer/{customerId}
@@ -50,25 +46,16 @@ public class OrderController {
     public ResponseEntity<OrderResponse> updateStatus(
             @PathVariable Integer id,
             @RequestBody Map<String, String> body) {
-        try {
-            String newStatus = body.get("orderStatus");
-            Optional<OrderResponse> response = orderService.updateStatus(id, newStatus);
-            return response
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        String newStatus = body.get("orderStatus");
+        return ResponseEntity.ok(orderService.updateStatus(id, newStatus));
+        // Both OrderNotFoundException + IllegalArgumentException → GlobalExceptionHandler
     }
 
     // DELETE /orders/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Integer id) {
-        boolean deleted = orderService.deleteOrder(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        orderService.deleteOrder(id);
+        return ResponseEntity.noContent().build();
     }
 
     // PATCH /orders/{id}/shipment
@@ -77,9 +64,6 @@ public class OrderController {
             @PathVariable Integer id,
             @RequestBody Map<String, Integer> body) {
         Integer shipmentId = body.get("shipmentId");
-        Optional<OrderResponse> response = orderService.linkShipment(id, shipmentId);
-        return response
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(orderService.linkShipment(id, shipmentId));
     }
 }

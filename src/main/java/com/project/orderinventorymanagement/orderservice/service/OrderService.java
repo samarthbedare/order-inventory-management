@@ -3,6 +3,7 @@ package com.project.orderinventorymanagement.orderservice.service;
 import com.project.orderinventorymanagement.orderservice.dto.OrderItemRequest;
 import com.project.orderinventorymanagement.orderservice.dto.OrderRequest;
 import com.project.orderinventorymanagement.orderservice.dto.OrderResponse;
+import com.project.orderinventorymanagement.orderservice.exception.OrderNotFoundException;
 import com.project.orderinventorymanagement.orderservice.model.Order;
 import com.project.orderinventorymanagement.orderservice.model.OrderItem;
 import com.project.orderinventorymanagement.orderservice.model.OrderStatus;
@@ -14,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -29,6 +29,16 @@ public class OrderService {
 
     @Transactional
     public OrderResponse createOrder(OrderRequest request) {
+        if (request.getCustomerId() == null) {
+            throw new IllegalArgumentException("Customer ID must not be null");
+        }
+        if (request.getStoreId() == null) {
+            throw new IllegalArgumentException("Store ID must not be null");
+        }
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Order must contain at least one item");
+        }
+
         // Step 1: Save Order first (without items)
         Order order = new Order();
         order.setCustomerId(request.getCustomerId());
@@ -58,12 +68,17 @@ public class OrderService {
         return toResponse(savedOrder);
     }
 
-    public Optional<OrderResponse> getOrderById(Integer id) {
-        return orderRepository.findById(id).map(this::toResponse);
+    public OrderResponse getOrderById(Integer id) {
+        return orderRepository.findById(id)
+                .map(this::toResponse)
+                .orElseThrow(() -> new OrderNotFoundException(id));
     }
 
     public List<OrderResponse> getOrdersByCustomer(Integer customerId) {
         List<Order> orders = orderRepository.findByCustomerId(customerId);
+        if (orders.isEmpty()) {
+            throw new OrderNotFoundException("No orders found for customer id: " + customerId);
+        }
         List<OrderResponse> responses = new ArrayList<>();
         for (Order order : orders) {
             responses.add(toResponse(order));
@@ -72,7 +87,11 @@ public class OrderService {
     }
 
     @Transactional
-    public Optional<OrderResponse> updateStatus(Integer id, String newStatus) {
+    public OrderResponse updateStatus(Integer id, String newStatus) {
+
+        if (newStatus == null || newStatus.isBlank()) {
+            throw new IllegalArgumentException("Order status must not be null or empty");
+        }
         OrderStatus status;
         try {
             status = OrderStatus.valueOf(newStatus.toUpperCase());
@@ -80,20 +99,21 @@ public class OrderService {
             throw new IllegalArgumentException("Invalid order status: " + newStatus);
         }
 
-        return orderRepository.findById(id).map(order -> {
-            order.setOrderStatus(status);
-            Order updated = orderRepository.save(order);
-            return toResponse(updated);
-        });
+        return orderRepository.findById(id)
+                .map(order -> {
+                    order.setOrderStatus(status);
+                    return toResponse(orderRepository.save(order));
+                })
+                .orElseThrow(() -> new OrderNotFoundException(id));
     }
 
     @Transactional
     public boolean deleteOrder(Integer id) {
-        if (orderRepository.existsById(id)) {
-            orderRepository.deleteById(id);
-            return true;
+        if (!orderRepository.existsById(id)) {
+            throw new OrderNotFoundException(id);
         }
-        return false;
+        orderRepository.deleteById(id);
+        return true;
     }
 
     private OrderResponse toResponse(Order order) {
@@ -122,15 +142,17 @@ public class OrderService {
     }
 
     @Transactional
-    public Optional<OrderResponse> linkShipment(Integer orderId, Integer shipmentId) {
-        return orderRepository.findById(orderId).map(order -> {
-            if (order.getOrderItems() != null) {
-                for (OrderItem item : order.getOrderItems()) {
-                    item.setShipmentId(shipmentId);
-                    orderItemRepository.save(item);
-                }
-            }
-            return toResponse(order);
-        });
+    public OrderResponse linkShipment(Integer orderId, Integer shipmentId) {
+        return orderRepository.findById(orderId)
+                .map(order -> {
+                    if (order.getOrderItems() != null) {
+                        for (OrderItem item : order.getOrderItems()) {
+                            item.setShipmentId(shipmentId);
+                            orderItemRepository.save(item);
+                        }
+                    }
+                    return toResponse(order);
+                })
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 }

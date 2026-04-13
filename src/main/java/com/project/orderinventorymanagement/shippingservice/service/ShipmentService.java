@@ -2,6 +2,7 @@ package com.project.orderinventorymanagement.shippingservice.service;
 
 import com.project.orderinventorymanagement.shippingservice.entity.Shipment;
 import com.project.orderinventorymanagement.shippingservice.entity.ShipmentStatus;
+import com.project.orderinventorymanagement.shippingservice.exception.ShipmentNotFoundException;
 import com.project.orderinventorymanagement.shippingservice.repository.ShipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,29 +15,27 @@ public class ShipmentService {
     @Autowired
     private ShipmentRepository shipmentRepository;
 
-    private String toDbValue(ShipmentStatus status) {
-        return status == ShipmentStatus.IN_TRANSIT ? "IN-TRANSIT" : status.name();
-    }
-
     public Shipment createShipment(Shipment shipment) {
-        shipment.setShipmentStatus(toDbValue(ShipmentStatus.CREATED));
+        shipment.setShipmentStatus(ShipmentStatus.CREATED);
         return shipmentRepository.save(shipment);
     }
 
     public Shipment getShipmentById(Integer id) {
-        return shipmentRepository.findById(id).orElse(null);
+        return shipmentRepository.findById(id)
+                .orElseThrow(() -> new ShipmentNotFoundException("Shipment not found for shipment id: " + id));
     }
 
     public Shipment updateStatus(Integer id, ShipmentStatus status) {
-        Shipment shipment = shipmentRepository.findById(id).orElse(null);
-        if (shipment != null) {
-            shipment.setShipmentStatus(toDbValue(status));
-            return shipmentRepository.save(shipment);
-        }
-        return null;
+        Shipment shipment = getShipmentById(id);
+        shipment.setShipmentStatus(status);
+        return shipmentRepository.save(shipment);
     }
 
     public List<Shipment> getShipmentsByCustomer(Integer customerId) {
-        return shipmentRepository.findByCustomerCustomerId(customerId);
+        List<Shipment> shipments = shipmentRepository.findByCustomerCustomerId(customerId);
+        if (shipments.isEmpty()) {
+            throw new ShipmentNotFoundException("Shipments not found for customer id: " + customerId);
+        }
+        return shipments;
     }
 }

@@ -1,10 +1,7 @@
 package com.project.orderinventorymanagement.shippingservice.entity;
 
 import com.project.orderinventorymanagement.customerservice.entity.Customer;
-
 import jakarta.persistence.*;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "shipments")
@@ -19,7 +16,8 @@ public class Shipment {
     private String deliveryAddress;
 
     @Column(name = "shipment_status", nullable = false)
-    private String shipmentStatus;
+    @Convert(converter = ShipmentStatusConverter.class)
+    private ShipmentStatus shipmentStatus;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
@@ -28,47 +26,44 @@ public class Shipment {
     @Column(name = "store_id", nullable = false)
     private Integer storeId;
 
-	
+    public Integer getShipmentId() {
+        return shipmentId;
+    }
 
-	public Integer getShipmentId() {
-		return shipmentId;
-	}
+    public void setShipmentId(Integer shipmentId) {
+        this.shipmentId = shipmentId;
+    }
 
-	public void setShipmentId(Integer shipmentId) {
-		this.shipmentId = shipmentId;
-	}
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
 
-	public String getDeliveryAddress() {
-		return deliveryAddress;
-	}
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
+    }
 
-	public void setDeliveryAddress(String deliveryAddress) {
-		this.deliveryAddress = deliveryAddress;
-	}
 
-	public String getShipmentStatus() {
-		return shipmentStatus;
-	}
+    public ShipmentStatus getShipmentStatus() {
+        return shipmentStatus;
+    }
 
-	public void setShipmentStatus(String shipmentStatus) {
-		this.shipmentStatus = shipmentStatus;
-	}
+    public void setShipmentStatus(ShipmentStatus shipmentStatus) {
+        this.shipmentStatus = shipmentStatus;
+    }
 
-	public Customer getCustomer() {
-		return customer;
-	}
+    public Customer getCustomer() {
+        return customer;
+    }
 
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
-	}
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 
-	public Integer getStoreId() {
-		return storeId;
-	}
+    public Integer getStoreId() {
+        return storeId;
+    }
 
-	public void setStoreId(Integer storeId) {
-		this.storeId = storeId;
-	}
-
-    
+    public void setStoreId(Integer storeId) {
+        this.storeId = storeId;
+    }
 }
