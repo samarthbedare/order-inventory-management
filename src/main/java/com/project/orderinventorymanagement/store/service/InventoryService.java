@@ -1,17 +1,15 @@
 package com.project.orderinventorymanagement.store.service;
 
- 
-
- 
-
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.project.orderinventorymanagement.store.dto.InventoryDTO;
 import com.project.orderinventorymanagement.store.entity.Inventory;
+import com.project.orderinventorymanagement.store.exception.InsufficientStockException;
+import com.project.orderinventorymanagement.store.exception.ResourceNotFoundException;
 import com.project.orderinventorymanagement.store.repository.InventoryRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class InventoryService {
@@ -22,23 +20,28 @@ public class InventoryService {
         this.repo = repo;
     }
 
-    // Get Inventory
-    public Inventory getInventory(Integer storeId, Integer productId) {
-        return repo.findByStoreStoreIdAndProductProductId(storeId, productId)
-                .orElseThrow(() -> new RuntimeException("Inventory not found"));
-    }
-    
-    //  Get stock across all stores for a product
+
     public List<Inventory> getStockByProduct(Integer productId) {
-        return repo.findByProductProductId(productId);
+        List<Inventory> inventoryList = repo.findByProductProductId(productId);
+
+
+        if (inventoryList.isEmpty()) {
+            throw new ResourceNotFoundException("No inventory records found for Product ID: " + productId);
+        }
+
+        return inventoryList;
     }
 
-    // Get all products in a store
     public List<Inventory> getProductsByStore(Integer storeId) {
-        return repo.findByStoreStoreId(storeId);
+        List<Inventory> inventoryList = repo.findByStoreStoreId(storeId);
+
+        if (inventoryList.isEmpty()) {
+            throw new ResourceNotFoundException("No products found for Store ID: " + storeId);
+        }
+
+        return inventoryList;
     }
 
-    // Reduce Quantity (After Order)
     @Transactional
     public void reduceStock(InventoryDTO dto) {
 
@@ -46,11 +49,11 @@ public class InventoryService {
         Inventory inventory = repo.findByStoreStoreIdAndProductProductId(
                 dto.getStoreId(),
                 dto.getProductId()
-        ).orElseThrow(() -> new RuntimeException("Product not found"));
+        ).orElseThrow(() -> new ResourceNotFoundException("Inventory record not found"));
 
         //Check stock
         if (inventory.getProductInventory() < dto.getQuantity()) {
-            throw new RuntimeException("Insufficient stock");
+            throw new InsufficientStockException("Not enough stock. Current stock is: " + inventory.getProductInventory());
         }
 
         //Reduce stock
@@ -63,15 +66,19 @@ public class InventoryService {
     }
 
 
-    //  Add Quantity (Restock)
     @Transactional
     public void addStock(InventoryDTO dto) {
 
-        Inventory inventory = getInventory(dto.getStoreId(), dto.getProductId());
+        Inventory inventory = repo.findByStoreStoreIdAndProductProductId(dto.getStoreId(), dto.getProductId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Inventory record not found for Store ID: " + dto.getStoreId() +
+                                " and Product ID: " + dto.getProductId()));
+
 
         inventory.setProductInventory(
                 inventory.getProductInventory() + dto.getQuantity()
         );
+
 
         repo.save(inventory);
     }

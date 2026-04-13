@@ -1,10 +1,9 @@
 package com.project.orderinventorymanagement.store.controller;
- 
- 
-import org.springframework.web.bind.annotation.*;
+
 
 import com.project.orderinventorymanagement.store.dto.StoreDTO;
 import com.project.orderinventorymanagement.store.service.StoreService;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,4 +26,17 @@ public class StoreController {
     public StoreDTO getStore(@PathVariable Integer id) {
         return service.getStoreById(id);
     }
+
+
+    @GetMapping("/search/address")
+    public List<StoreDTO> getByPhysicalAddress(@RequestParam("q") String address) {
+        return service.searchByPhysicalAddress(address);
+    }
+
+    @PostMapping("/addStore")
+
+    public StoreDTO addStore(@RequestBody StoreDTO storeDTO) {
+        return service.createStore(storeDTO);
+    }
+
 }

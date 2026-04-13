@@ -12,6 +12,7 @@ public class Store {
 
     @Id
     @Column(name = "store_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer storeId;
 
     @Column(name = "store_name")
@@ -31,7 +32,7 @@ public class Store {
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Inventory> inventories;
-   
+
 
     @Column(name = "logo_mime_type")
     private String logoMimeType;
@@ -45,88 +46,86 @@ public class Store {
     @Column(name = "logo_last_updated")
     private LocalDate logoLastUpdated;
 
-	public Integer getStoreId() {
-		return storeId;
-	}
+    public Integer getStoreId() {
+        return storeId;
+    }
 
-	public void setStoreId(Integer storeId) {
-		this.storeId = storeId;
-	}
+    public void setStoreId(Integer storeId) {
+        this.storeId = storeId;
+    }
 
-	public String getStoreName() {
-		return storeName;
-	}
+    public String getStoreName() {
+        return storeName;
+    }
 
-	public void setStoreName(String storeName) {
-		this.storeName = storeName;
-	}
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
 
-	public String getWebAddress() {
-		return webAddress;
-	}
+    public String getWebAddress() {
+        return webAddress;
+    }
 
-	public void setWebAddress(String webAddress) {
-		this.webAddress = webAddress;
-	}
+    public void setWebAddress(String webAddress) {
+        this.webAddress = webAddress;
+    }
 
-	public String getPhysicalAddress() {
-		return physicalAddress;
-	}
+    public String getPhysicalAddress() {
+        return physicalAddress;
+    }
 
-	public void setPhysicalAddress(String physicalAddress) {
-		this.physicalAddress = physicalAddress;
-	}
+    public void setPhysicalAddress(String physicalAddress) {
+        this.physicalAddress = physicalAddress;
+    }
 
-	public BigDecimal getLatitude() {
-		return latitude;
-	}
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
 
-	public void setLatitude(BigDecimal latitude) {
-		this.latitude = latitude;
-	}
+    public void setLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
+    }
 
-	public BigDecimal getLongitude() {
-		return longitude;
-	}
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
 
-	public void setLongitude(BigDecimal longitude) {
-		this.longitude = longitude;
-	}
+    public void setLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
+    }
 
-	 
 
-	public String getLogoMimeType() {
-		return logoMimeType;
-	}
+    public String getLogoMimeType() {
+        return logoMimeType;
+    }
 
-	public void setLogoMimeType(String logoMimeType) {
-		this.logoMimeType = logoMimeType;
-	}
+    public void setLogoMimeType(String logoMimeType) {
+        this.logoMimeType = logoMimeType;
+    }
 
-	public String getLogoFilename() {
-		return logoFilename;
-	}
+    public String getLogoFilename() {
+        return logoFilename;
+    }
 
-	public void setLogoFilename(String logoFilename) {
-		this.logoFilename = logoFilename;
-	}
+    public void setLogoFilename(String logoFilename) {
+        this.logoFilename = logoFilename;
+    }
 
-	public String getLogoCharset() {
-		return logoCharset;
-	}
+    public String getLogoCharset() {
+        return logoCharset;
+    }
 
-	public void setLogoCharset(String logoCharset) {
-		this.logoCharset = logoCharset;
-	}
+    public void setLogoCharset(String logoCharset) {
+        this.logoCharset = logoCharset;
+    }
 
-	public LocalDate getLogoLastUpdated() {
-		return logoLastUpdated;
-	}
+    public LocalDate getLogoLastUpdated() {
+        return logoLastUpdated;
+    }
 
-	public void setLogoLastUpdated(LocalDate logoLastUpdated) {
-		this.logoLastUpdated = logoLastUpdated;
-	}
+    public void setLogoLastUpdated(LocalDate logoLastUpdated) {
+        this.logoLastUpdated = logoLastUpdated;
+    }
 
-    // getters & setters
     
 }
