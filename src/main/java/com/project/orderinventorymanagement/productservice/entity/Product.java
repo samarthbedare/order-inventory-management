@@ -1,6 +1,6 @@
 package com.project.orderinventorymanagement.productservice.entity;
 
-import com.project.orderinventorymanagement.store.entity.Inventory;
+import com.project.orderinventorymanagement.storeservice.entity.Inventory;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
