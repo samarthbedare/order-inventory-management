@@ -1,55 +1,54 @@
 package com.project.orderinventorymanagement.customerservice.controller;
 
+import com.project.orderinventorymanagement.customerservice.dto.CustomerDTO;
+import com.project.orderinventorymanagement.customerservice.service.CustomerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.project.orderinventorymanagement.customerservice.entity.Customer;
-import com.project.orderinventorymanagement.customerservice.service.CustomerService;
-
 @RestController
-@RequestMapping("/customers")
+@RequestMapping("/api/v1/customers")
 public class CustomerController {
 
     @Autowired
     private CustomerService service;
 
     @GetMapping
-    public List<Customer> getAll() {
-        return service.getAllCustomers();
+    public ResponseEntity<List<CustomerDTO>> getAll() {
+        return ResponseEntity.ok(service.getAllCustomers());
     }
 
     @GetMapping("/{id}")
-    public Customer getById(@PathVariable Integer id) { // Changed to Integer
-        return service.getCustomer(id);
+    public ResponseEntity<CustomerDTO> getById(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.getCustomer(id));
+    }
+
+    @GetMapping("/email/{email:.+}")
+    public ResponseEntity<CustomerDTO> getByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(service.getCustomerByEmail(email));
     }
 
     @PostMapping
-    public Customer create(@RequestBody Customer c) {
-        return service.createCustomer(c);
+    public ResponseEntity<CustomerDTO> create(@RequestBody CustomerDTO c) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createCustomer(c));
     }
 
     @PutMapping("/{id}")
-    public Customer update(@PathVariable Integer id, @RequestBody Customer c) { // Changed to Integer
-        return service.updateCustomer(id, c);
+    public ResponseEntity<CustomerDTO> update(@PathVariable Integer id, @RequestBody CustomerDTO c) {
+        return ResponseEntity.ok(service.updateCustomer(id, c));
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Integer id) { // Changed to Integer
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         service.deleteCustomer(id);
-        return "Deleted";
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/validate/{id}")
-    public boolean validate(@PathVariable Integer id) { // Changed to Integer
-        return service.validateCustomer(id);
+    public ResponseEntity<Boolean> validate(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.validateCustomer(id));
     }
 }
