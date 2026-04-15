@@ -5,20 +5,11 @@ import java.math.BigDecimal;
 
 public class OrderItemRequest {
 
-    private Integer lineItemId;
     private Integer productId;
     private BigDecimal unitPrice;
     private Integer quantity;
 
     public OrderItemRequest() {
-    }
-
-    public Integer getLineItemId() {
-        return lineItemId;
-    }
-
-    public void setLineItemId(Integer lineItemId) {
-        this.lineItemId = lineItemId;
     }
 
     public Integer getProductId() {

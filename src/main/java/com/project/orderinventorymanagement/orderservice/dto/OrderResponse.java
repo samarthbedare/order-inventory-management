@@ -1,7 +1,7 @@
 package com.project.orderinventorymanagement.orderservice.dto;
 
 
-import com.project.orderinventorymanagement.orderservice.model.OrderStatus;
+import com.project.orderinventorymanagement.orderservice.entity.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,7 +14,7 @@ public class OrderResponse {
     private Integer customerId;
     private OrderStatus orderStatus;
     private Integer storeId;
-    private List<ItemDetail> items;
+    private ItemDetail item;
 
     public OrderResponse() {
     }
@@ -59,12 +59,12 @@ public class OrderResponse {
         this.storeId = storeId;
     }
 
-    public List<ItemDetail> getItems() {
-        return items;
+    public ItemDetail getItem() {
+        return item;
     }
 
-    public void setItems(List<ItemDetail> items) {
-        this.items = items;
+    public void setItem(ItemDetail item) {
+        this.item = item;
     }
 
     public static class ItemDetail {

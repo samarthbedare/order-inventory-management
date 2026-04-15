@@ -4,11 +4,17 @@ import com.project.orderinventorymanagement.orderservice.dto.OrderItemRequest;
 import com.project.orderinventorymanagement.orderservice.dto.OrderRequest;
 import com.project.orderinventorymanagement.orderservice.dto.OrderResponse;
 import com.project.orderinventorymanagement.orderservice.exception.OrderNotFoundException;
-import com.project.orderinventorymanagement.orderservice.model.Order;
-import com.project.orderinventorymanagement.orderservice.model.OrderItem;
-import com.project.orderinventorymanagement.orderservice.model.OrderStatus;
+import com.project.orderinventorymanagement.orderservice.entity.Order;
+import com.project.orderinventorymanagement.orderservice.entity.OrderItem;
+import com.project.orderinventorymanagement.orderservice.entity.OrderStatus;
 import com.project.orderinventorymanagement.orderservice.repository.OrderItemRepository;
 import com.project.orderinventorymanagement.orderservice.repository.OrderRepository;
+import com.project.orderinventorymanagement.storeservice.dto.InventoryDTO;
+import com.project.orderinventorymanagement.storeservice.service.InventoryService;
+import com.project.orderinventorymanagement.shippingservice.service.ShipmentService;
+import com.project.orderinventorymanagement.shippingservice.entity.Shipment;
+import com.project.orderinventorymanagement.customerservice.repository.CustomerRepository;
+import com.project.orderinventorymanagement.customerservice.entity.Customer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,51 +27,77 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
+    private final InventoryService inventoryService;
+    private final ShipmentService shipmentService;
+    private final CustomerRepository customerRepository;
 
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository) {
+    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, 
+                        InventoryService inventoryService, ShipmentService shipmentService, 
+                        CustomerRepository customerRepository) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
+        this.inventoryService = inventoryService;
+        this.shipmentService = shipmentService;
+        this.customerRepository = customerRepository;
     }
 
     @Transactional
-    public OrderResponse createOrder(OrderRequest request) {
+    public List<OrderResponse> createOrder(OrderRequest request) {
         if (request.getCustomerId() == null) {
             throw new IllegalArgumentException("Customer ID must not be null");
         }
         if (request.getStoreId() == null) {
             throw new IllegalArgumentException("Store ID must not be null");
         }
+        if (request.getDeliveryAddress() == null || request.getDeliveryAddress().isBlank()) {
+            throw new IllegalArgumentException("Delivery Address must not be null or empty");
+        }
         if (request.getItems() == null || request.getItems().isEmpty()) {
             throw new IllegalArgumentException("Order must contain at least one item");
         }
 
-        // Step 1: Save Order first (without items)
-        Order order = new Order();
-        order.setCustomerId(request.getCustomerId());
-        order.setStoreId(request.getStoreId());
-        order.setOrderTms(LocalDateTime.now());
-        order.setOrderStatus(OrderStatus.OPEN);
-        order.setOrderItems(new ArrayList<>());
+        // Fetch Customer for Shipment
+        Customer customer = customerRepository.findById(request.getCustomerId())
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found for id: " + request.getCustomerId()));
 
-        Order savedOrder = orderRepository.save(order);
-        Integer generatedOrderId = savedOrder.getOrderId();
+        // Create a single Shipment for this Order Checkout
+        Shipment shipment = new Shipment();
+        shipment.setCustomer(customer);
+        shipment.setStoreId(request.getStoreId());
+        shipment.setDeliveryAddress(request.getDeliveryAddress());
+        Shipment savedShipment = shipmentService.createShipment(shipment);
 
-        // Step 2: Save each OrderItem separately with the generated order_id
-        List<OrderItem> savedItems = new ArrayList<>();
-        if (request.getItems() != null) {
-            for (OrderItemRequest itemReq : request.getItems()) {
-                OrderItem item = new OrderItem();
-                item.setOrderId(generatedOrderId);  // manually set FK = PK
-                item.setLineItemId(itemReq.getLineItemId());
-                item.setProductId(itemReq.getProductId());
-                item.setUnitPrice(itemReq.getUnitPrice());
-                item.setQuantity(itemReq.getQuantity());
-                savedItems.add(orderItemRepository.save(item));
-            }
+        List<OrderResponse> createdOrders = new ArrayList<>();
+
+        for (OrderItemRequest itemReq : request.getItems()) {
+            // Check & Reduce Inventory
+            InventoryDTO inventoryDTO = new InventoryDTO();
+            inventoryDTO.setStoreId(request.getStoreId());
+            inventoryDTO.setProductId(itemReq.getProductId());
+            inventoryDTO.setQuantity(itemReq.getQuantity());
+            inventoryService.reduceStock(inventoryDTO);
+
+            // Create separate Order for the single item to satisfy DB constraints
+            Order order = new Order();
+            order.setCustomerId(request.getCustomerId());
+            order.setStoreId(request.getStoreId());
+            order.setOrderTms(LocalDateTime.now());
+            order.setOrderStatus(OrderStatus.OPEN);
+
+            OrderItem item = new OrderItem();
+            item.setLineItemId(1);
+            item.setProductId(itemReq.getProductId());
+            item.setUnitPrice(itemReq.getUnitPrice());
+            item.setQuantity(itemReq.getQuantity());
+            item.setShipmentId(savedShipment.getShipmentId()); // Automatically link shipment
+
+            order.setItem(item);
+
+            Order savedOrder = orderRepository.save(order);
+            createdOrders.add(toResponse(savedOrder));
         }
 
-        savedOrder.setOrderItems(savedItems);
-        return toResponse(savedOrder);
+        return createdOrders;
     }
 
     public OrderResponse getOrderById(Integer id) {
@@ -78,6 +110,30 @@ public class OrderService {
         List<Order> orders = orderRepository.findByCustomerId(customerId);
         if (orders.isEmpty()) {
             throw new OrderNotFoundException("No orders found for customer id: " + customerId);
+        }
+        List<OrderResponse> responses = new ArrayList<>();
+        for (Order order : orders) {
+            responses.add(toResponse(order));
+        }
+        return responses;
+    }
+
+    public List<OrderResponse> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        if (orders.isEmpty()) {
+            throw new OrderNotFoundException("No orders found in the system");
+        }
+        List<OrderResponse> responses = new ArrayList<>();
+        for (Order order : orders) {
+            responses.add(toResponse(order));
+        }
+        return responses;
+    }
+
+    public List<OrderResponse> getOrdersByStore(Integer storeId) {
+        List<Order> orders = orderRepository.findByStoreId(storeId);
+        if (orders.isEmpty()) {
+            throw new OrderNotFoundException("No orders found for store id: " + storeId);
         }
         List<OrderResponse> responses = new ArrayList<>();
         for (Order order : orders) {
@@ -124,20 +180,17 @@ public class OrderService {
         response.setOrderStatus(order.getOrderStatus());
         response.setStoreId(order.getStoreId());
 
-        List<OrderResponse.ItemDetail> itemDetails = new ArrayList<>();
-        if (order.getOrderItems() != null) {
-            for (OrderItem item : order.getOrderItems()) {
-                OrderResponse.ItemDetail detail = new OrderResponse.ItemDetail();
-                detail.setOrderId(item.getOrderId());
-                detail.setLineItemId(item.getLineItemId());
-                detail.setProductId(item.getProductId());
-                detail.setUnitPrice(item.getUnitPrice());
-                detail.setQuantity(item.getQuantity());
-                detail.setShipmentId(item.getShipmentId());
-                itemDetails.add(detail);
-            }
+        OrderItem item = order.getItem();
+        if (item != null) {
+            OrderResponse.ItemDetail detail = new OrderResponse.ItemDetail();
+            detail.setOrderId(item.getOrderId());
+            detail.setLineItemId(item.getLineItemId());
+            detail.setProductId(item.getProductId());
+            detail.setUnitPrice(item.getUnitPrice());
+            detail.setQuantity(item.getQuantity());
+            detail.setShipmentId(item.getShipmentId());
+            response.setItem(detail);
         }
-        response.setItems(itemDetails);
         return response;
     }
 
@@ -145,11 +198,10 @@ public class OrderService {
     public OrderResponse linkShipment(Integer orderId, Integer shipmentId) {
         return orderRepository.findById(orderId)
                 .map(order -> {
-                    if (order.getOrderItems() != null) {
-                        for (OrderItem item : order.getOrderItems()) {
-                            item.setShipmentId(shipmentId);
-                            orderItemRepository.save(item);
-                        }
+                    OrderItem item = order.getItem();
+                    if (item != null) {
+                        item.setShipmentId(shipmentId);
+                        orderItemRepository.save(item);
                     }
                     return toResponse(order);
                 })

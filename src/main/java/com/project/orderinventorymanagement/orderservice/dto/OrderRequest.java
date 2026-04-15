@@ -7,6 +7,7 @@ public class OrderRequest {
 
     private Integer customerId;
     private Integer storeId;
+    private String deliveryAddress;
     private List<OrderItemRequest> items;
 
     public OrderRequest() {
@@ -34,5 +35,13 @@ public class OrderRequest {
 
     public void setItems(List<OrderItemRequest> items) {
         this.items = items;
+    }
+
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
+
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
     }
 }

@@ -1,6 +1,6 @@
 package com.project.orderinventorymanagement.orderservice.repository;
 
-import com.project.orderinventorymanagement.orderservice.model.OrderItem;
+import com.project.orderinventorymanagement.orderservice.entity.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
