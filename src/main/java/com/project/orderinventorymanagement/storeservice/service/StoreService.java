@@ -1,10 +1,10 @@
-package com.project.orderinventorymanagement.store.service;
+package com.project.orderinventorymanagement.storeservice.service;
 
 
-import com.project.orderinventorymanagement.store.dto.StoreDTO;
-import com.project.orderinventorymanagement.store.entity.Store;
-import com.project.orderinventorymanagement.store.exception.ResourceNotFoundException;
-import com.project.orderinventorymanagement.store.repository.StoreRepository;
+import com.project.orderinventorymanagement.storeservice.dto.StoreDTO;
+import com.project.orderinventorymanagement.storeservice.entity.Store;
+import com.project.orderinventorymanagement.storeservice.exception.ResourceNotFoundException;
+import com.project.orderinventorymanagement.storeservice.repository.StoreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,10 +37,6 @@ public class StoreService {
     public List<StoreDTO> searchByPhysicalAddress(String address) {
         List<Store> stores = repo.findByPhysicalAddressContainingIgnoreCase(address);
 
-        if (stores.isEmpty()) {
-            throw new ResourceNotFoundException("No store found at physical address: " + address);
-        }
-
         return stores.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -65,6 +61,26 @@ public class StoreService {
 
         Store savedStore = repo.save(store);
         return convertToDTO(savedStore);
+    }
+
+    public StoreDTO updateStore(Integer id, StoreDTO dto) {
+        Store store = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Store not found with ID :" + id));
+
+        if (dto.getStoreName() != null && !dto.getStoreName().isBlank()) store.setStoreName(dto.getStoreName());
+        if (dto.getWebAddress() != null && !dto.getWebAddress().isBlank()) store.setWebAddress(dto.getWebAddress());
+        if (dto.getPhysicalAddress() != null && !dto.getPhysicalAddress().isBlank()) store.setPhysicalAddress(dto.getPhysicalAddress());
+        if (dto.getLatitude() != null) store.setLatitude(dto.getLatitude());
+        if (dto.getLongitude() != null) store.setLongitude(dto.getLongitude());
+
+        return convertToDTO(repo.save(store));
+    }
+
+    public void deleteStore(Integer id) {
+        if (!repo.existsById(id)) {
+            throw new ResourceNotFoundException("Cannot delete: Store not found with ID :" + id);
+        }
+        repo.deleteById(id);
     }
 
     private StoreDTO convertToDTO(Store store) {
