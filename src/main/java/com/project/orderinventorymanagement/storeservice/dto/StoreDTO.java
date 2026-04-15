@@ -1,4 +1,4 @@
-package com.project.orderinventorymanagement.store.dto;
+package com.project.orderinventorymanagement.storeservice.dto;
 
 import java.math.BigDecimal;
 

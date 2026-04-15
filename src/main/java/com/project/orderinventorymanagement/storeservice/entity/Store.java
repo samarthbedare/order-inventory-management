@@ -1,4 +1,4 @@
-package com.project.orderinventorymanagement.store.entity;
+package com.project.orderinventorymanagement.storeservice.entity;
 
 import jakarta.persistence.*;
 
@@ -15,7 +15,7 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer storeId;
 
-    @Column(name = "store_name")
+    @Column(name = "store_name", nullable = false)
     private String storeName;
 
     @Column(name = "web_address")
