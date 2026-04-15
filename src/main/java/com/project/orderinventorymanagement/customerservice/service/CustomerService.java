@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.project.orderinventorymanagement.customerservice.dto.CustomerDTO;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomerService {
@@ -16,27 +18,39 @@ public class CustomerService {
     private CustomerRepository repo;
 
 
-    public List<Customer> getAllCustomers() {
+    public List<CustomerDTO> getAllCustomers() {
         List<Customer> customers = repo.findAll();
         if (customers.isEmpty()) {
             throw new CustomerNotFoundException("No customers found in the system");
         }
-        return customers;
+        return customers.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
 
-    public Customer getCustomer(Integer id) {
+    public CustomerDTO getCustomer(Integer id) {
         if (id == null || id <= 0) {
             throw new InvalidCustomerDataException("Customer ID must be a positive number");
         }
         return repo.findById(id)
+                .map(this::toDTO)
                 .orElseThrow(() -> new CustomerNotFoundException(
                         "Customer not found with ID: " + id
                 ));
     }
 
+    public CustomerDTO getCustomerByEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new InvalidCustomerDataException("Email address cannot be empty");
+        }
+        return repo.findByEmailAddress(email)
+                .map(this::toDTO)
+                .orElseThrow(() -> new CustomerNotFoundException(
+                        "Customer not found with email: " + email
+                ));
+    }
 
-    public Customer createCustomer(Customer c) {
+
+    public CustomerDTO createCustomer(CustomerDTO c) {
 
         if (c.getFullName() == null || c.getFullName().isBlank()) {
             throw new InvalidCustomerDataException("Full name cannot be empty");
@@ -46,10 +60,7 @@ public class CustomerService {
         }
 
 
-        boolean emailExists = repo.findAll()
-                .stream()
-                .anyMatch(existing -> existing.getEmailAddress()
-                        .equalsIgnoreCase(c.getEmailAddress()));
+        boolean emailExists = repo.existsByEmailAddress(c.getEmailAddress());
 
         if (emailExists) {
             throw new CustomerAlreadyExistsException(
@@ -57,12 +68,16 @@ public class CustomerService {
             );
         }
 
-        return repo.save(c);
+        Customer entity = new Customer();
+        entity.setFullName(c.getFullName());
+        entity.setEmailAddress(c.getEmailAddress());
+
+        return toDTO(repo.save(entity));
     }
 
 
     @Transactional
-    public Customer updateCustomer(Integer id, Customer c) {
+    public CustomerDTO updateCustomer(Integer id, CustomerDTO c) {
 
         if (id == null || id <= 0) {
             throw new InvalidCustomerDataException("Customer ID must be a positive number");
@@ -85,7 +100,7 @@ public class CustomerService {
         existing.setEmailAddress(c.getEmailAddress());
 
         try {
-            return repo.save(existing);
+            return toDTO(repo.save(existing));
         } catch (Exception e) {
             throw new CustomerUpdateException(
                     "Failed to update customer with ID: " + id + ". " + e.getMessage()
@@ -122,5 +137,13 @@ public class CustomerService {
             );
         }
         return repo.existsById(id);
+    }
+
+    private CustomerDTO toDTO(Customer customer) {
+        CustomerDTO dto = new CustomerDTO();
+        dto.setCustomerId(customer.getCustomerId());
+        dto.setFullName(customer.getFullName());
+        dto.setEmailAddress(customer.getEmailAddress());
+        return dto;
     }
 }
