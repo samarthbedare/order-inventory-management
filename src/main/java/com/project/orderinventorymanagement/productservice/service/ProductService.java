@@ -18,9 +18,10 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    public List<ProductDTO> getAllProducts(String brand, String colour, String size) {
+    public List<ProductDTO> getAllProducts(String name, String brand, String colour, String size) {
         List<Product> products =
-                productRepository.findByBrandContainingIgnoreCaseAndColourContainingIgnoreCaseAndSizeContainingIgnoreCase(
+                productRepository.findByProductNameContainingIgnoreCaseAndBrandContainingIgnoreCaseAndColourContainingIgnoreCaseAndSizeContainingIgnoreCase(
+                        name == null ? "" : name,
                         brand == null ? "" : brand,
                         colour == null ? "" : colour,
                         size == null ? "" : size
@@ -69,6 +70,13 @@ public class ProductService {
 
         Product updated = productRepository.save(existing);
         return convertToDTO(updated);
+    }
+
+    public void deleteProduct(Integer id) {
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException("Cannot delete: Product not found with id: " + id);
+        }
+        productRepository.deleteById(id);
     }
 
     private ProductDTO convertToDTO(Product product) {
