@@ -1,66 +1,58 @@
 package com.project.orderinventorymanagement.shippingservice.controller;
 
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import com.project.orderinventorymanagement.customerservice.entity.Customer;
-import com.project.orderinventorymanagement.customerservice.service.CustomerService;
 import com.project.orderinventorymanagement.shippingservice.dto.ShipmentRequestDTO;
 import com.project.orderinventorymanagement.shippingservice.dto.ShipmentResponseDTO;
-import com.project.orderinventorymanagement.shippingservice.entity.Shipment;
 import com.project.orderinventorymanagement.shippingservice.entity.ShipmentStatus;
 import com.project.orderinventorymanagement.shippingservice.service.ShipmentService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/shipments")
+@RequestMapping("/api/v1/shipments")
 public class ShipmentController {
 
-    @Autowired
-    private ShipmentService shipmentService;
+    private final ShipmentService shipmentService;
 
-    @Autowired
-    private CustomerService customerService;
+    public ShipmentController(ShipmentService shipmentService) {
+        this.shipmentService = shipmentService;
+    }
 
     @PostMapping
     public ResponseEntity<ShipmentResponseDTO> createShipment(@RequestBody ShipmentRequestDTO request) {
-        Shipment shipment = new Shipment();
-        shipment.setDeliveryAddress(request.getDeliveryAddress());
-        shipment.setStoreId(request.getStoreId());
-        
-        
-        Customer customer = customerService.getCustomer(request.getCustomerId());
-        
-        shipment.setCustomer(customer);
-
-        Shipment savedShipment = shipmentService.createShipment(shipment);
-        return ResponseEntity.ok(convertToResponseDTO(savedShipment));
-    }
-
-    private ShipmentResponseDTO convertToResponseDTO(Shipment shipment) {
-        ShipmentResponseDTO dto = new ShipmentResponseDTO();
-        dto.setShipmentId(shipment.getShipmentId());
-        dto.setCustomerId(shipment.getCustomer().getCustomerId());
-        dto.setStoreId(shipment.getStoreId());
-        dto.setDeliveryAddress(shipment.getDeliveryAddress());
-        dto.setShipmentStatus(shipment.getShipmentStatus());
-        return dto;
+        return ResponseEntity.status(HttpStatus.CREATED).body(shipmentService.createShipment(request));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Shipment> getShipment(@PathVariable Integer id) {
-        Shipment shipment = shipmentService.getShipmentById(id);
-        return shipment != null ? ResponseEntity.ok(shipment) : ResponseEntity.notFound().build();
+    public ResponseEntity<ShipmentResponseDTO> getShipment(@PathVariable Integer id) {
+        return ResponseEntity.ok(shipmentService.getShipmentById(id));
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Shipment> updateStatus(@PathVariable Integer id, @RequestBody ShipmentStatus status) {
-        Shipment updated = shipmentService.updateStatus(id, status);
-        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    public ResponseEntity<ShipmentResponseDTO> updateStatus(@PathVariable Integer id, @RequestBody ShipmentStatus status) {
+        return ResponseEntity.ok(shipmentService.updateStatus(id, status));
     }
 
     @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<Shipment>> getCustomerShipments(@PathVariable Integer customerId) {
+    public ResponseEntity<List<ShipmentResponseDTO>> getCustomerShipments(@PathVariable Integer customerId) {
         return ResponseEntity.ok(shipmentService.getShipmentsByCustomer(customerId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ShipmentResponseDTO>> getAllShipments() {
+        return ResponseEntity.ok(shipmentService.getAllShipments());
+    }
+
+    @GetMapping("/store/{storeId}")
+    public ResponseEntity<List<ShipmentResponseDTO>> getStoreShipments(@PathVariable Integer storeId) {
+        return ResponseEntity.ok(shipmentService.getShipmentsByStore(storeId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteShipment(@PathVariable Integer id) {
+        shipmentService.deleteShipment(id);
+        return ResponseEntity.noContent().build();
     }
 }
