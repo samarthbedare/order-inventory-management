@@ -1,4 +1,4 @@
-package com.project.orderinventorymanagement.store.entity;
+package com.project.orderinventorymanagement.storeservice.entity;
 
  
 import com.project.orderinventorymanagement.productservice.entity.Product;
@@ -6,7 +6,7 @@ import com.project.orderinventorymanagement.productservice.entity.Product;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "inventory")
+@Table(name = "inventory", uniqueConstraints = {@UniqueConstraint(columnNames={"store_id", "product_id"})})
 public class Inventory {
 
     @Id
@@ -22,7 +22,7 @@ public class Inventory {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product; 
 
-    @Column(name = "product_inventory")
+    @Column(name = "product_inventory", nullable = false)
     private Integer productInventory; // quantity
 
 	public Integer getInventoryId() {
