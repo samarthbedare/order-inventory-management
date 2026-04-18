@@ -28,6 +28,10 @@ public class InventoryService {
         this.productRepo = productRepo;
     }
 
+    public List<InventoryDTO> getAllInventory() {
+        return repo.findAll().stream().map(this::convertToDTO).collect(java.util.stream.Collectors.toList());
+    }
+
     public List<InventoryDTO> getStockByProduct(Integer productId) {
         List<Inventory> inventoryList = repo.findByProductProductId(productId);
         if (inventoryList.isEmpty()) {

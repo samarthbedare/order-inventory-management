@@ -282,6 +282,82 @@ public class SystemFlowIntegrationTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @Order(7)
+    @DisplayName("Phase 7: Security & Authorization Failures")
+    public void test07_SecurityFailures() throws Exception {
+        // 1. Unauthorized Access (No Token)
+        mockMvc.perform(get("/api/v1/customers"))
+                .andExpect(status().isForbidden());
+
+        // 2. Invalid Token
+        mockMvc.perform(get("/api/v1/orders")
+                .header("Authorization", "Bearer invalid_token_here"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("Phase 8: Resource Not Found Failures")
+    public void test08_NotFoundFailures() throws Exception {
+        // 1. Customer Not Found
+        mockMvc.perform(get("/api/v1/customers/999999")
+                .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isNotFound());
+
+        // 2. Product Not Found
+        mockMvc.perform(get("/api/v1/products/999999")
+                .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isNotFound());
+
+        // 3. Order Not Found
+        mockMvc.perform(get("/api/v1/orders/999999")
+                .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("Phase 9: Business Rules & Data Integrity Failures")
+    public void test09_BusinessRuleFailures() throws Exception {
+        // 1. Duplicate Customer Email
+        CustomerDTO duplicateReq = new CustomerDTO();
+        duplicateReq.setFullName("Duplicate John");
+        duplicateReq.setEmailAddress(customerEmail); // Already created in test02
+
+        mockMvc.perform(post("/api/v1/customers")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(duplicateReq)))
+                .andExpect(status().isConflict());
+
+        // 2. Insufficient Stock
+        OrderItemRequest overLimitItem = new OrderItemRequest();
+        overLimitItem.setProductId(productId);
+        overLimitItem.setQuantity(1000); // We only added 50-5+10 = 55 in test04
+        overLimitItem.setUnitPrice(new BigDecimal("105.50"));
+
+        OrderRequest overLimitOrder = new OrderRequest();
+        overLimitOrder.setCustomerId(customerId);
+        overLimitOrder.setStoreId(storeId);
+        overLimitOrder.setDeliveryAddress("Overlimit Blvd");
+        overLimitOrder.setItems(Collections.singletonList(overLimitItem));
+
+        mockMvc.perform(post("/api/v1/orders")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(overLimitOrder)))
+                .andExpect(status().isConflict());
+
+        // 3. Invalid Order Status Update
+        Map<String, String> invalidStatus = Map.of("orderStatus", "NOT_A_REAL_STATUS");
+        mockMvc.perform(patch("/api/v1/orders/" + orderId + "/status")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidStatus)))
+                .andExpect(status().isBadRequest());
+    }
+
     @AfterAll
     public void tearDown() throws Exception {
         System.out.println(">>> DYNAMIC SECURED CLEANUP START <<<");

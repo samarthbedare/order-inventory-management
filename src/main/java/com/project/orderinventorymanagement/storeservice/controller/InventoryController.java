@@ -19,6 +19,11 @@ public class InventoryController {
         this.service = service;
     }
 
+    @GetMapping
+    public ResponseEntity<List<InventoryDTO>> getAllInventory() {
+        return ResponseEntity.ok(service.getAllInventory());
+    }
+
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<InventoryDTO>> getStockByProduct(@PathVariable Integer productId) {
         return ResponseEntity.ok(service.getStockByProduct(productId));
