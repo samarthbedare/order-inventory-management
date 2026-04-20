@@ -24,7 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ProductController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class ProductControllerTest {
+class ProductControllerTest {
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,7 +46,7 @@ public class ProductControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testGetAllProducts() throws Exception {
+    void testGetAllProducts() throws Exception {
         ProductDTO prod = new ProductDTO();
         prod.setProductName("Jeans");
         
@@ -57,7 +58,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testGetProductById() throws Exception {
+    void testGetProductById() throws Exception {
         ProductDTO prod = new ProductDTO();
         prod.setProductId(10);
         prod.setProductName("Shirt");
@@ -70,7 +71,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testCreateProduct() throws Exception {
+    void testCreateProduct() throws Exception {
         ProductDTO prod = new ProductDTO();
         prod.setProductName("New Product");
 
@@ -84,7 +85,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testUpdateProduct() throws Exception {
+    void testUpdateProduct() throws Exception {
         com.project.orderinventorymanagement.productservice.dto.ProductUpdateDTO prodUpdate = 
                 new com.project.orderinventorymanagement.productservice.dto.ProductUpdateDTO();
 
@@ -101,7 +102,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testDeleteProduct() throws Exception {
+    void testDeleteProduct() throws Exception {
         mockMvc.perform(delete("/api/v1/products/10"))
                 .andExpect(status().isNoContent());
 

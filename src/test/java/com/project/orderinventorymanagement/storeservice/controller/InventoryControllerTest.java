@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import com.project.orderinventorymanagement.security.JwtUtil;
@@ -22,7 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(InventoryController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class InventoryControllerTest {
+class InventoryControllerTest {
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,7 +43,7 @@ public class InventoryControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testCreateInventoryRecord() throws Exception {
+    void testCreateInventoryRecord() throws Exception {
         InventoryDTO dto = new InventoryDTO();
         dto.setProductId(1);
         dto.setStoreId(1);
@@ -59,7 +59,7 @@ public class InventoryControllerTest {
     }
 
     @Test
-    public void testAddStock() throws Exception {
+    void testAddStock() throws Exception {
         InventoryDTO dto = new InventoryDTO();
         dto.setProductId(1);
         dto.setStoreId(1);

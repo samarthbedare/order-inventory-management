@@ -10,25 +10,23 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
+
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     public List<ProductDTO> getAllProducts(String name, String brand, String colour, String size) {
-        List<Product> products =
-                productRepository.findByProductNameContainingIgnoreCaseAndBrandContainingIgnoreCaseAndColourContainingIgnoreCaseAndSizeContainingIgnoreCase(
-                        name == null ? "" : name,
-                        brand == null ? "" : brand,
-                        colour == null ? "" : colour,
-                        size == null ? "" : size
-                );
-
-        return products.stream().map(this::convertToDTO).collect(Collectors.toList());
+        List<Product> products = productRepository.findByFilters(name, brand, colour, size);
+        return products.stream().map(this::convertToDTO).toList();
     }
+
+
 
     public ProductDTO getProductById(Integer id) {
         Product product = productRepository.findById(id)

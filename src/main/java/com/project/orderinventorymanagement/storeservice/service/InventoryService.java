@@ -29,24 +29,27 @@ public class InventoryService {
     }
 
     public List<InventoryDTO> getAllInventory() {
-        return repo.findAll().stream().map(this::convertToDTO).collect(java.util.stream.Collectors.toList());
+        return repo.findAll().stream().map(this::convertToDTO).toList();
     }
+
 
     public List<InventoryDTO> getStockByProduct(Integer productId) {
         List<Inventory> inventoryList = repo.findByProductProductId(productId);
         if (inventoryList.isEmpty()) {
             throw new ResourceNotFoundException("No inventory records found for Product ID: " + productId);
         }
-        return inventoryList.stream().map(this::convertToDTO).collect(java.util.stream.Collectors.toList());
+        return inventoryList.stream().map(this::convertToDTO).toList();
     }
+
 
     public List<InventoryDTO> getProductsByStore(Integer storeId) {
         List<Inventory> inventoryList = repo.findByStoreStoreId(storeId);
         if (inventoryList.isEmpty()) {
             throw new ResourceNotFoundException("No products found for Store ID: " + storeId);
         }
-        return inventoryList.stream().map(this::convertToDTO).collect(java.util.stream.Collectors.toList());
+        return inventoryList.stream().map(this::convertToDTO).toList();
     }
+
 
     @Transactional
     public InventoryDTO createInventoryRecord(InventoryDTO dto) {

@@ -1,5 +1,7 @@
 package com.project.orderinventorymanagement.security;
 
+import com.project.orderinventorymanagement.security.dto.SignupRequest;
+import com.project.orderinventorymanagement.security.dto.UserResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,9 +26,12 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public AdminUser signup(@RequestBody AdminUser user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return adminRepo.save(user);
+    public UserResponse signup(@RequestBody SignupRequest request) {
+        AdminUser user = new AdminUser();
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        AdminUser saved = adminRepo.save(user);
+        return new UserResponse(saved.getId(), saved.getUsername());
     }
 
     @PostMapping("/login")
