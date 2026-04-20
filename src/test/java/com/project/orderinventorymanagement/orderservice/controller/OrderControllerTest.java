@@ -4,28 +4,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.orderinventorymanagement.orderservice.dto.OrderRequest;
 import com.project.orderinventorymanagement.orderservice.dto.OrderResponse;
 import com.project.orderinventorymanagement.orderservice.service.OrderService;
+import com.project.orderinventorymanagement.security.AdminUserRepository;
+import com.project.orderinventorymanagement.security.JwtAuthenticationFilter;
+import com.project.orderinventorymanagement.security.JwtUtil;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import com.project.orderinventorymanagement.security.JwtUtil;
-import com.project.orderinventorymanagement.security.JwtAuthenticationFilter;
-import com.project.orderinventorymanagement.security.AdminUserRepository;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(OrderController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class OrderControllerTest {
+class OrderControllerTest {
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,10 +47,10 @@ public class OrderControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testCreateOrder() throws Exception {
+    void testCreateOrder() throws Exception {
         OrderRequest req = new OrderRequest();
         req.setCustomerId(1);
-        
+
         OrderResponse res = new OrderResponse();
         res.setOrderId(100);
 
@@ -63,7 +64,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    public void testGetAllOrders() throws Exception {
+    void testGetAllOrders() throws Exception {
         OrderResponse res = new OrderResponse();
         res.setOrderId(100);
 
@@ -75,7 +76,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    public void testGetOrderById() throws Exception {
+    void testGetOrderById() throws Exception {
         OrderResponse res = new OrderResponse();
         res.setOrderId(100);
 
@@ -87,7 +88,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    public void testGetOrdersByStore() throws Exception {
+    void testGetOrdersByStore() throws Exception {
         OrderResponse res = new OrderResponse();
         res.setStoreId(5);
 
@@ -99,7 +100,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    public void testDeleteOrder() throws Exception {
+    void testDeleteOrder() throws Exception {
         mockMvc.perform(delete("/api/v1/orders/1"))
                 .andExpect(status().isNoContent());
 

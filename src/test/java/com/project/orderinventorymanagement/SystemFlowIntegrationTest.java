@@ -36,7 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class SystemFlowIntegrationTest {
+class SystemFlowIntegrationTest {
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -57,7 +58,7 @@ public class SystemFlowIntegrationTest {
     private String customerEmail = "dynamic.secured." + System.currentTimeMillis() + "@test.com";
 
     @BeforeAll
-    public void setup() throws Exception {
+    void setup() throws Exception {
         // 1. Dynamic Signup
         Map<String, String> signupReq = Map.of("username", adminUser, "password", adminPass);
         mockMvc.perform(post("/api/v1/auth/signup")
@@ -81,7 +82,7 @@ public class SystemFlowIntegrationTest {
     @Test
     @Order(1)
     @DisplayName("Phase 1: Environment Baseline")
-    public void test01_Baselines() throws Exception {
+    void test01_Baselines() throws Exception {
         mockMvc.perform(get("/api/v1/products")).andExpect(status().isOk());
         mockMvc.perform(get("/api/v1/stores")).andExpect(status().isOk());
         
@@ -93,7 +94,7 @@ public class SystemFlowIntegrationTest {
     @Test
     @Order(2)
     @DisplayName("Phase 2: Customer Lifecycle (Secured)")
-    public void test02_CustomerFlow() throws Exception {
+    void test02_CustomerFlow() throws Exception {
         CustomerDTO customerReq = new CustomerDTO();
         customerReq.setFullName("Dynamic Secured John");
         customerReq.setEmailAddress(customerEmail);
@@ -123,7 +124,7 @@ public class SystemFlowIntegrationTest {
     @Test
     @Order(3)
     @DisplayName("Phase 3: Store & Product Lifecycle")
-    public void test03_StoreProductFlow() throws Exception {
+    void test03_StoreProductFlow() throws Exception {
         StoreDTO storeReq = new StoreDTO();
         storeReq.setStoreName("Secured Dynamic Store " + System.currentTimeMillis());
         storeReq.setPhysicalAddress("123 Auth Lane, CA");
@@ -166,7 +167,7 @@ public class SystemFlowIntegrationTest {
     @Test
     @Order(4)
     @DisplayName("Phase 4: Inventory Management (Secured)")
-    public void test04_InventoryFlow() throws Exception {
+    void test04_InventoryFlow() throws Exception {
         InventoryDTO invReq = new InventoryDTO();
         invReq.setStoreId(storeId);
         invReq.setProductId(productId);
@@ -199,7 +200,7 @@ public class SystemFlowIntegrationTest {
     @Test
     @Order(5)
     @DisplayName("Phase 5: Order Processing (Secured)")
-    public void test05_OrderFlow() throws Exception {
+    void test05_OrderFlow() throws Exception {
         OrderItemRequest itemReq = new OrderItemRequest();
         itemReq.setProductId(productId);
         itemReq.setQuantity(1);
@@ -239,7 +240,7 @@ public class SystemFlowIntegrationTest {
     @Test
     @Order(6)
     @DisplayName("Phase 6: Logistics & Shipments (Secured)")
-    public void test06_LogisticsFlow() throws Exception {
+    void test06_LogisticsFlow() throws Exception {
         MvcResult shipRes = mockMvc.perform(get("/api/v1/shipments/customer/" + customerId).header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -285,7 +286,7 @@ public class SystemFlowIntegrationTest {
     @Test
     @Order(7)
     @DisplayName("Phase 7: Security & Authorization Failures")
-    public void test07_SecurityFailures() throws Exception {
+    void test07_SecurityFailures() throws Exception {
         // 1. Unauthorized Access (No Token)
         mockMvc.perform(get("/api/v1/customers"))
                 .andExpect(status().isForbidden());
@@ -299,7 +300,7 @@ public class SystemFlowIntegrationTest {
     @Test
     @Order(8)
     @DisplayName("Phase 8: Resource Not Found Failures")
-    public void test08_NotFoundFailures() throws Exception {
+    void test08_NotFoundFailures() throws Exception {
         // 1. Customer Not Found
         mockMvc.perform(get("/api/v1/customers/999999")
                 .header("Authorization", "Bearer " + adminToken))
@@ -319,7 +320,7 @@ public class SystemFlowIntegrationTest {
     @Test
     @Order(9)
     @DisplayName("Phase 9: Business Rules & Data Integrity Failures")
-    public void test09_BusinessRuleFailures() throws Exception {
+    void test09_BusinessRuleFailures() throws Exception {
         // 1. Duplicate Customer Email
         CustomerDTO duplicateReq = new CustomerDTO();
         duplicateReq.setFullName("Duplicate John");
@@ -359,7 +360,7 @@ public class SystemFlowIntegrationTest {
     }
 
     @AfterAll
-    public void tearDown() throws Exception {
+    void tearDown() throws Exception {
         System.out.println(">>> DYNAMIC SECURED CLEANUP START <<<");
         try {
             if (orderId != null) mockMvc.perform(delete("/api/v1/orders/" + orderId).header("Authorization", "Bearer " + adminToken));

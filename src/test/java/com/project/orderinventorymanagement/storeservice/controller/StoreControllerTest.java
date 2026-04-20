@@ -24,7 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(StoreController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class StoreControllerTest {
+class StoreControllerTest {
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,7 +46,7 @@ public class StoreControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testGetAllStores() throws Exception {
+    void testGetAllStores() throws Exception {
         StoreDTO store = new StoreDTO();
         store.setStoreId(1);
         store.setStoreName("Test Store");
@@ -58,7 +59,7 @@ public class StoreControllerTest {
     }
 
     @Test
-    public void testCreateStore() throws Exception {
+    void testCreateStore() throws Exception {
         StoreDTO store = new StoreDTO();
         store.setStoreName("New Store");
 
@@ -72,7 +73,7 @@ public class StoreControllerTest {
     }
 
     @Test
-    public void testDeleteStore() throws Exception {
+    void testDeleteStore() throws Exception {
         mockMvc.perform(delete("/api/v1/stores/1"))
                 .andExpect(status().isNoContent());
 

@@ -2,13 +2,13 @@ package com.project.orderinventorymanagement.storeservice.controller;
 
 
 import com.project.orderinventorymanagement.storeservice.dto.InventoryDTO;
-import com.project.orderinventorymanagement.storeservice.entity.Inventory;
 import com.project.orderinventorymanagement.storeservice.service.InventoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/inventory")
 public class InventoryController {
@@ -48,6 +48,7 @@ public class InventoryController {
     public ResponseEntity<InventoryDTO> addStock(@RequestBody InventoryDTO dto) {
         return ResponseEntity.ok(service.addStock(dto));
     }
+
     @DeleteMapping("/store/{storeId}/product/{productId}")
     public ResponseEntity<Void> deleteInventory(@PathVariable Integer storeId, @PathVariable Integer productId) {
         service.deleteInventory(storeId, productId);

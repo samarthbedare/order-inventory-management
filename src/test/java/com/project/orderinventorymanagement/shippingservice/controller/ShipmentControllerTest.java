@@ -2,28 +2,30 @@ package com.project.orderinventorymanagement.shippingservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.orderinventorymanagement.customerservice.service.CustomerService;
+import com.project.orderinventorymanagement.security.AdminUserRepository;
+import com.project.orderinventorymanagement.security.JwtAuthenticationFilter;
+import com.project.orderinventorymanagement.security.JwtUtil;
 import com.project.orderinventorymanagement.shippingservice.dto.ShipmentResponseDTO;
 import com.project.orderinventorymanagement.shippingservice.service.ShipmentService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import com.project.orderinventorymanagement.security.JwtUtil;
-import com.project.orderinventorymanagement.security.JwtAuthenticationFilter;
-import com.project.orderinventorymanagement.security.AdminUserRepository;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ShipmentController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class ShipmentControllerTest {
+class ShipmentControllerTest {
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,7 +49,7 @@ public class ShipmentControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testGetAllShipments() throws Exception {
+    void testGetAllShipments() throws Exception {
         ShipmentResponseDTO shipment = new ShipmentResponseDTO();
         shipment.setShipmentId(10);
         shipment.setCustomerId(1);
@@ -60,7 +62,7 @@ public class ShipmentControllerTest {
     }
 
     @Test
-    public void testGetShipmentById() throws Exception {
+    void testGetShipmentById() throws Exception {
         ShipmentResponseDTO shipment = new ShipmentResponseDTO();
         shipment.setShipmentId(10);
         shipment.setCustomerId(1);
@@ -73,7 +75,7 @@ public class ShipmentControllerTest {
     }
 
     @Test
-    public void testDeleteShipment() throws Exception {
+    void testDeleteShipment() throws Exception {
         mockMvc.perform(delete("/api/v1/shipments/10"))
                 .andExpect(status().isNoContent());
 

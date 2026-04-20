@@ -29,7 +29,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
-public class BusinessLogicFlowIntegrationTest {
+class BusinessLogicFlowIntegrationTest {
+
 
     @Autowired
     private CustomerService customerService;
@@ -50,7 +51,7 @@ public class BusinessLogicFlowIntegrationTest {
     private ShipmentService shipmentService;
 
     @Test
-    public void testCompleteEcommerceLifecycle() {
+    void testCompleteEcommerceLifecycle() {
         // 1. Create a Fake Environment Customer
         CustomerDTO customerReq = new CustomerDTO();
         customerReq.setFullName("E2E Test Customer");

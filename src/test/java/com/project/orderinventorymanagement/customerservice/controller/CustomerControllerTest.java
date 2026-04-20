@@ -24,7 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CustomerController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class CustomerControllerTest {
+class CustomerControllerTest {
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,7 +46,7 @@ public class CustomerControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testGetAllCustomers() throws Exception {
+    void testGetAllCustomers() throws Exception {
         CustomerDTO customer = new CustomerDTO();
         customer.setCustomerId(1);
         customer.setFullName("John Doe");
@@ -58,7 +59,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    public void testGetCustomerById() throws Exception {
+    void testGetCustomerById() throws Exception {
         CustomerDTO customer = new CustomerDTO();
         customer.setCustomerId(1);
         customer.setFullName("Jane Doe");
@@ -71,7 +72,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    public void testGetCustomerByEmail() throws Exception {
+    void testGetCustomerByEmail() throws Exception {
         CustomerDTO customer = new CustomerDTO();
         customer.setCustomerId(1);
         customer.setEmailAddress("test@test.com");
@@ -84,7 +85,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    public void testCreateCustomer() throws Exception {
+    void testCreateCustomer() throws Exception {
         CustomerDTO customer = new CustomerDTO();
         customer.setFullName("New User");
 
@@ -98,7 +99,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    public void testUpdateCustomer() throws Exception {
+    void testUpdateCustomer() throws Exception {
         CustomerDTO customer = new CustomerDTO();
         customer.setFullName("Updated User");
 
@@ -112,7 +113,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    public void testDeleteCustomer() throws Exception {
+    void testDeleteCustomer() throws Exception {
         mockMvc.perform(delete("/api/v1/customers/1"))
                 .andExpect(status().isNoContent());
 
